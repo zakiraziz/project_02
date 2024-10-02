@@ -5,7 +5,7 @@ from OpenGL.GLUT import *
 from OpenGL.GLU import *
 import numpy as np
 
-# Define the vertices of the cube
+# Define the vertices of the cube 
 vertices = [
     [1, 1, -1],
     [1, -1, -1],
