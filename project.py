@@ -1,11 +1,10 @@
 import pygame
 from pygame.locals import *
 from OpenGL.GL import *
-from OpenGL.GLUT import *
 from OpenGL.GLU import *
 import numpy as np
 
-# Define the vertices of the cube 
+# Define the vertices of the cube
 vertices = [
     [1, 1, -1],
     [1, -1, -1],
@@ -53,19 +52,19 @@ colors = [
     [1, 0, 1]
 ]
 
-def draw_cube():
+def draw_cube(scale):
     glBegin(GL_QUADS)
     for i, surface in enumerate(surfaces):
         glColor3fv(colors[i])
         for vertex in surface:
-            glVertex3fv(vertices[vertex])
+            glVertex3fv(np.array(vertices[vertex]) * scale)
     glEnd()
 
     glBegin(GL_LINES)
     glColor3fv((1, 1, 1))
     for edge in edges:
         for vertex in edge:
-            glVertex3fv(vertices[vertex])
+            glVertex3fv(np.array(vertices[vertex]) * scale)
     glEnd()
 
 def main():
@@ -77,6 +76,9 @@ def main():
     glTranslatef(0.0, 0.0, -5)
 
     clock = pygame.time.Clock()
+    angle = 0
+    scale = 1
+    scale_direction = 1
 
     while True:
         for event in pygame.event.get():
@@ -87,11 +89,16 @@ def main():
         # Rotate the cube
         glRotatef(1, 3, 1, 1)
 
+        # Pulsing effect by scaling the cube
+        scale += scale_direction * 0.01
+        if scale >= 1.5 or scale <= 0.8:
+            scale_direction *= -1
+
         # Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-        # Draw the cube
-        draw_cube()
+        # Draw the cube with scaling effect
+        draw_cube(scale)
 
         # Update the display
         pygame.display.flip()
