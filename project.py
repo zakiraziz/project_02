@@ -4,7 +4,7 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 import numpy as np
 
-# Define the vertices of the cube
+# Vertices for a cube
 vertices = [
     [1, 1, -1],
     [1, -1, -1],
@@ -16,7 +16,7 @@ vertices = [
     [-1, 1, 1]
 ]
 
-# Define the edges of the cube
+# Define edges and surfaces
 edges = [
     [0, 1],
     [1, 2],
@@ -32,7 +32,6 @@ edges = [
     [3, 7]
 ]
 
-# Define the surfaces of the cube
 surfaces = [
     [0, 1, 2, 3],
     [4, 5, 6, 7],
@@ -42,20 +41,23 @@ surfaces = [
     [1, 2, 6, 5]
 ]
 
-# Define the colors for the cube faces
+# Smoother color transition (gradient-like)
 colors = [
-    [1, 0, 0],
-    [0, 1, 0],
-    [0, 0, 1],
-    [1, 1, 0],
-    [0, 1, 1],
-    [1, 0, 1]
+    [1, 0, 0],  # Red
+    [0, 1, 0],  # Green
+    [0, 0, 1],  # Blue
+    [1, 1, 0],  # Yellow
+    [0, 1, 1],  # Cyan
+    [1, 0, 1],  # Magenta
+    [0.5, 0.5, 0.5],  # Gray
+    [1, 0.5, 0]  # Orange
 ]
 
-def draw_cube(scale):
+# Function to draw the enhanced cube
+def draw_enhanced_cube(scale):
     glBegin(GL_QUADS)
     for i, surface in enumerate(surfaces):
-        glColor3fv(colors[i])
+        glColor3fv(np.interp(np.linspace(0, 1, 3), [0, 1], colors[i][:3]))  # Smooth color transition
         for vertex in surface:
             glVertex3fv(np.array(vertices[vertex]) * scale)
     glEnd()
@@ -67,16 +69,28 @@ def draw_cube(scale):
             glVertex3fv(np.array(vertices[vertex]) * scale)
     glEnd()
 
+def set_lighting():
+    glEnable(GL_LIGHTING)
+    glEnable(GL_LIGHT0)
+    glEnable(GL_COLOR_MATERIAL)
+    glLightfv(GL_LIGHT0, GL_POSITION, (1, 1, 1, 0))
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, (1, 1, 1, 1))  # White light
+    glLightfv(GL_LIGHT0, GL_SPECULAR, (1, 1, 1, 1))  # Specular highlight
+
 def main():
     pygame.init()
     display = (800, 600)
     pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
 
+    # Perspective setup
     gluPerspective(45, (display[0] / display[1]), 0.1, 50.0)
-    glTranslatef(0.0, 0.0, -5)
+    glTranslatef(0.0, 0.0, -7)
+
+    # Set smooth shading and lighting
+    glShadeModel(GL_SMOOTH)
+    set_lighting()
 
     clock = pygame.time.Clock()
-    angle = 0
     scale = 1
     scale_direction = 1
 
@@ -86,24 +100,24 @@ def main():
                 pygame.quit()
                 quit()
 
-        # Rotate the cube
+        # Rotate cube for each frame
         glRotatef(1, 3, 1, 1)
 
-        # Pulsing effect by scaling the cube
+        # Pulsing effect
         scale += scale_direction * 0.01
-        if scale >= 1.5 or scale <= 0.8:
+        if scale >= 1.5 or scale <= 0.7:
             scale_direction *= -1
 
         # Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-        # Draw the cube with scaling effect
-        draw_cube(scale)
+        # Draw the enhanced cube with lighting
+        draw_enhanced_cube(scale)
 
-        # Update the display
+        # Update display
         pygame.display.flip()
 
-        # Cap the frame rate
+        # Cap frame rate
         clock.tick(60)
 
 if __name__ == "__main__":
